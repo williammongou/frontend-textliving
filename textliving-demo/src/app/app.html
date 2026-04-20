@@ -1,0 +1,151 @@
+<div class="container">
+  <!-- Header with Token Bar and Ingest Button -->
+  <header class="main-header">
+    <div class="header-content">
+      <h1>TextLiving Campaign Generator</h1>
+      <p class="subtitle">AI-Powered Promotional SMS Creator</p>
+    </div>
+    <button
+      *ngIf="showIngestButton"
+      (click)="openFileDialog()"
+      class="btn-ingest">
+      📂 Ingest Data
+    </button>
+  </header>
+
+  <!-- Token Usage Bar -->
+  <div class="token-bar-container">
+    <div class="token-bar-label">
+      <span>Token Usage Today</span>
+      <span class="token-count">{{ tokenUsage.tokensUsedToday }} / {{ tokenUsage.tokenLimit }}</span>
+    </div>
+    <div class="token-bar-track">
+      <div
+        class="token-bar-fill"
+        [class]="getTokenBarClass()"
+        [style.width.%]="tokenUsage.percentageUsed">
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Interface -->
+  <div class="chat-container">
+    <!-- Messages -->
+    <div class="messages-area">
+      <div
+        *ngFor="let message of messages"
+        class="message"
+        [class.message-user]="message.role === 'user'"
+        [class.message-assistant]="message.role === 'assistant'">
+
+        <div class="message-avatar">
+          <span *ngIf="message.role === 'user'">👤</span>
+          <span *ngIf="message.role === 'assistant'">🤖</span>
+        </div>
+
+        <div class="message-content">
+          <div class="message-text" [innerHTML]="formatMarkdown(message.content)"></div>
+
+          <!-- Campaign Options (if present) -->
+          <div *ngIf="message.campaignResult" class="campaign-options">
+            <!-- Option 1 -->
+            <div class="campaign-option">
+              <div class="option-header">
+                <span class="option-label">Option 1</span>
+                <button
+                  (click)="copyToClipboard(message.campaignResult.option1.messageText)"
+                  class="btn-copy-small">
+                  📋 Copy
+                </button>
+              </div>
+              <div class="sms-preview">{{ message.campaignResult.option1.messageText }}</div>
+              <div class="option-details">
+                <div class="detail-row">
+                  <span class="detail-label">📊 Best Time:</span>
+                  <span>{{ message.campaignResult.option1.bestSendTime }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">🎯 Predicted:</span>
+                  <span>{{ message.campaignResult.option1.predictedConversionRate }}%</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">💬 Tone:</span>
+                  <span>{{ message.campaignResult.option1.toneAnalysis }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Option 2 -->
+            <div class="campaign-option">
+              <div class="option-header">
+                <span class="option-label">Option 2</span>
+                <button
+                  (click)="copyToClipboard(message.campaignResult.option2.messageText)"
+                  class="btn-copy-small">
+                  📋 Copy
+                </button>
+              </div>
+              <div class="sms-preview">{{ message.campaignResult.option2.messageText }}</div>
+              <div class="option-details">
+                <div class="detail-row">
+                  <span class="detail-label">📊 Best Time:</span>
+                  <span>{{ message.campaignResult.option2.bestSendTime }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">🎯 Predicted:</span>
+                  <span>{{ message.campaignResult.option2.predictedConversionRate }}%</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">💬 Tone:</span>
+                  <span>{{ message.campaignResult.option2.toneAnalysis }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="message message-assistant">
+        <div class="message-avatar">🤖</div>
+        <div class="message-content">
+          <div class="message-text">
+            <span class="generating-text">Generating<span class="dots"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div *ngIf="errorMessage" class="error-banner">
+        ⚠️ {{ errorMessage }}
+      </div>
+
+      <div class="input-row">
+        <input
+          type="text"
+          [(ngModel)]="userInput"
+          (keydown.enter)="sendMessage()"
+          [disabled]="isLoading"
+          placeholder="Type your prompt... e.g., 'Create a promo text for 20% off pizza'"
+          class="chat-input" />
+
+        <button
+          (click)="sendMessage()"
+          [disabled]="isLoading || !userInput.trim()"
+          class="btn-send">
+          <span *ngIf="!isLoading">Send →</span>
+          <span *ngIf="isLoading">...</span>
+        </button>
+
+        <button
+          (click)="clearChat()"
+          [disabled]="isLoading"
+          class="btn-clear">
+          🗑️
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
