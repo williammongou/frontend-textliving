@@ -10,6 +10,7 @@ import {
   TokenUsageResponse,
   HistoricalCampaignData
 } from './models/campaign.model';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,7 @@ import {
   styleUrls: ['./app.css']
 })
 export class AppComponent {
-  private apiUrl = 'http://localhost:5000/api/campaign';
+  private apiUrl = environment.apiUrl + '/api/campaign';
 
   // Chat state
   messages: ChatMessage[] = [];
